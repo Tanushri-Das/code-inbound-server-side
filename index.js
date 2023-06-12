@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const port = process.env.PORT || 5000;
@@ -45,65 +44,60 @@ async function run() {
         res.send(formattedQuestions);
       } catch (error) {
         console.log(error);
-        res
-          .status(500)
-          .json({
-            success: false,
-            message: "An error occurred while fetching questions",
-          });
+        res.status(500).json({
+          success: false,
+          message: "An error occurred while fetching questions",
+        });
       }
     });
 
-app.post("/surveyAnswers", async (req, res) => {
-  try {
-    const answers = req.body.answers;
-    const surveyCompleted = req.body.surveyCompleted;
+    app.post("/surveyAnswers", async (req, res) => {
+      try {
+        const answers = req.body.answers;
+        const surveyCompleted = req.body.surveyCompleted;
 
-    // Generate a unique session ID
-    const sessionId = uuidv4();
+        // Generate a unique session ID
+        const sessionId = uuidv4();
 
-    // Format the answers
-    const formattedAnswers = answers.map((answer) => ({
-      questionId: answer.questionId,
-      value: answer.value,
-    }));
+        // Format the answers
+        const formattedAnswers = answers.map((answer) => ({
+          questionId: answer.questionId,
+          value: answer.value,
+        }));
 
-    // Create an object with the sessionId, answers, and survey completion status
-    const surveyData = {
-      sessionId: sessionId,
-      answers: formattedAnswers,
-      surveyCompleted: surveyCompleted,
-    };
+        // Create an object with the sessionId, answers, and survey completion status
+        const surveyData = {
+          sessionId: sessionId,
+          answers: formattedAnswers,
+          surveyCompleted: surveyCompleted,
+        };
 
-    // Insert the survey data into the surveyAnswers collection
-    const result = await surveyAnswersCollection.insertOne(surveyData);
+        // Insert the survey data into the surveyAnswers collection
+        const result = await surveyAnswersCollection.insertOne(surveyData);
 
-    if (result.acknowledged) {
-      const insertedDocument = await surveyAnswersCollection.findOne({
-        _id: result.insertedId,
-      });
+        if (result.acknowledged) {
+          const insertedDocument = await surveyAnswersCollection.findOne({
+            _id: result.insertedId,
+          });
 
-      if (insertedDocument) {
-        console.log("insertedDocument:", insertedDocument);
-        res.json({ success: true, answers: insertedDocument });
-      } else {
-        throw new Error("Unable to retrieve inserted document");
+          if (insertedDocument) {
+            console.log("insertedDocument:", insertedDocument);
+            res.json({ success: true, answers: insertedDocument });
+          } else {
+            throw new Error("Unable to retrieve inserted document");
+          }
+        } else {
+          throw new Error("Failed to insert document");
+        }
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({
+          success: false,
+          message: "An error occurred while adding the answers",
+        });
       }
-    } else {
-      throw new Error("Failed to insert document");
-    }
-  } catch (error) {
-    console.log(error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "An error occurred while adding the answers",
-      });
-  }
-});
+    });
 
-    
     app.post("/addQuestion", async (req, res) => {
       try {
         const question = {
@@ -121,12 +115,10 @@ app.post("/surveyAnswers", async (req, res) => {
         res.send(insertedQuestion);
       } catch (error) {
         console.log(error);
-        res
-          .status(500)
-          .json({
-            success: false,
-            message: "An error occurred while adding the question",
-          });
+        res.status(500).json({
+          success: false,
+          message: "An error occurred while adding the question",
+        });
       }
     });
     app.get("/getQuestions", async (req, res) => {
@@ -141,12 +133,10 @@ app.post("/surveyAnswers", async (req, res) => {
         res.send(formattedQuestions);
       } catch (error) {
         console.log(error);
-        res
-          .status(500)
-          .json({
-            success: false,
-            message: "An error occurred while fetching questions",
-          });
+        res.status(500).json({
+          success: false,
+          message: "An error occurred while fetching questions",
+        });
       }
     });
     app.post("/startSession", async (req, res) => {
@@ -156,7 +146,12 @@ app.post("/surveyAnswers", async (req, res) => {
         res.status(200).json({ sessionId });
       } catch (error) {
         console.log(error);
-        res.status(500).json({ success: false, message: "An error occurred while starting the session" });
+        res
+          .status(500)
+          .json({
+            success: false,
+            message: "An error occurred while starting the session",
+          });
       }
     });
   } finally {
@@ -170,5 +165,5 @@ app.get("/", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`servay app is running on port ${port}`);
+  console.log(`Servay App is running on port ${port}`);
 });
